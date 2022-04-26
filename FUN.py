@@ -30,7 +30,7 @@ def tograyscale(mat):
     return scaled_mat
 
 
-def noise(img, MU, TAU):
+def noise(img, TAU, MU):
     """
     Ajout d'un bruit gaussien aux pixels de l'image
     """
@@ -43,6 +43,24 @@ def noise(img, MU, TAU):
     
     return img_noised
 
+
+def create_noised_image(img, name, TAU, MU = [0,1]):
+    """
+    img = chemin vers l'image à bruiter
+    name = suffixe de l'image bruitée enregistrée
+    TAU = écart-type pour le bruit gaussien
+    MU = moyenne pour le bruit gaussien MU[0] = 0, MU[1] = 1 par défaut donc bruit centré
+    """
+    
+    
+    img_bin = load_image(img)
+    img_bin_noised = noise(img_bin, TAU, MU)
+    plt.imshow(img_bin_noised, cmap = "gray")
+    
+    tosave = Image.fromarray(tograyscale(img_bin_noised))
+    tosave.convert("L").save("data/"+str(name)+"_"+str(TAU)+".png")
+    
+    
 def sample(i, j, X, Y, maxi, maxj, ALPHA, BETA, TAU, MU):
     """
     Echantillonne dans la distribution conditionnelle selon la formule que j'ai calculée
