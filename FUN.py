@@ -85,9 +85,9 @@ def sample(i, j, X, Y, maxi, maxj, ALPHA, BETA, TAU, MU):
     pond = 4/len(voisins) 
     
     # Calcul de la probabilité de valoir 1
-    exp_valeur_1 = -ALPHA + BETA * pond * (nb_0-nb_1) + 1/2*(TAU**2)*(MU[1]**2 - MU[0]**2 + 2*Y[i][j]*(MU[0]-MU[1]))
+    exp_valeur_1 = -ALPHA + BETA * pond * (nb_0-nb_1) + 1/(2*(TAU**2))*(MU[1]**2 - MU[0]**2 + 2*Y[i][j]*(MU[0]-MU[1]))
     # Calcul de la probabilité de valoir 0 (juste pour vérifier)
-    exp_valeur_0 = ALPHA + BETA * pond * (nb_1-nb_0) + 1/2*(TAU**2)*(MU[0]**2 - MU[1]**2 + 2*Y[i][j]*(MU[1]-MU[0]))
+    exp_valeur_0 = ALPHA + BETA * pond * (nb_1-nb_0) + 1/(2*(TAU**2))*(MU[0]**2 - MU[1]**2 + 2*Y[i][j]*(MU[1]-MU[0]))
     
     #print(1/(1+np.exp(exp_valeur_1)) + 1/(1+np.exp(exp_valeur_0)))
     #print(1/(1+np.exp(exp_valeur_0)))
@@ -103,6 +103,9 @@ def get_posterior(filename, burn_in, samples, ALPHA, BETA, TAU, MU = [0,1]):
     Par défaut mu vaut [0,1] donc pas de biais
     """
     Y = load_image(filename) # Chargement de l'image
+    plt.imshow(Y, cmap = "gray") # Affichage de l'image bruitée
+    plt.show()
+
     posterior = np.zeros(Y.shape)
     X = np.random.choice([1,0], size = Y.shape) #Initialisation de la sortie
     maxi = Y.shape[0]
