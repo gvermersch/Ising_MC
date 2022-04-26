@@ -43,11 +43,7 @@ def noise(img, MU, TAU):
     
     return img_noised
 
-# Je ne sais pas comment décider de ces valeurs
-ALPHA = 0.005
-BETA = 0.4
-
-def sample(i, j, X, Y, maxi, maxj):
+def sample(i, j, X, Y, maxi, maxj, ALPHA, BETA):
     """
     Echantillonne dans la distribution conditionnelle selon la formule que j'ai calculée
     """
@@ -84,7 +80,7 @@ def sample(i, j, X, Y, maxi, maxj):
     return(int(np.random.rand() < prob)) # Renvoie 1 si l'uniforme est inférieure à la proba de valoir 1
     
     
-def get_posterior(filename, burn_in, samples):
+def get_posterior(filename, burn_in, samples, ALPHA, BETA):
     """
     Output les fréquences de valoir 1 pour chaque pixel
     """
@@ -99,7 +95,7 @@ def get_posterior(filename, burn_in, samples):
         # Ici on boucle de manière déterministe, idéalement il faudrait le faire de manière aléatoire
         for i in range(X.shape[0]):
             for j in range(X.shape[1]):
-                x = sample(i, j, X, Y, maxi, maxj)
+                x = sample(i, j, X, Y, maxi, maxj, ALPHA, BETA)
                 X[i,j] = x
                 
                 if x == 1 and step >= burn_in:
@@ -111,13 +107,13 @@ def get_posterior(filename, burn_in, samples):
 
     return posterior
 
-def denoise_image(filename, burn_in, samples):
+def denoise_image(filename, burn_in, samples, ALPHA, BETA):
     """
     Ici on considère comme 1 valant 1 les pixels où le posterior 
     vaut 1 à une fréquence supérieure à seuil
     """
     
-    posterior = get_posterior(filename, burn_in, samples)
+    posterior = get_posterior(filename, burn_in, samples, ALPHA, BETA)
     denoised = np.zeros(posterior.shape, dtype=np.float64)
     denoised[posterior > 0.5] = 1 # POur passer des probas à des valeurs 
     
