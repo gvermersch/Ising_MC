@@ -38,12 +38,13 @@ def noise(img, MU, TAU):
     row, col = np.shape(img)
     for i in range(row):
         for j in range(col):
-            img_noised[i,j] = np.random.normal(loc = MU[int(img[i,j])], scale = TAU**2)
+            # ATTENTION: scale c'est l'écart type 
+            img_noised[i,j] = np.random.normal(loc = MU[int(img[i,j])], scale = TAU)
     
     return img_noised
 
 # Je ne sais pas comment décider de ces valeurs
-ALPHA = 0.0125
+ALPHA = 0.005
 BETA = 0.4
 
 def sample(i, j, X, Y, maxi, maxj):
@@ -51,7 +52,7 @@ def sample(i, j, X, Y, maxi, maxj):
     Echantillonne dans la distribution conditionnelle selon la formule que j'ai calculée
     """
     MU = [0,1]
-    TAU = 0.4
+    TAU = 0.1
     # Ajout des valeurs des 4 voisins du pixel considéré, si pertinent
     voisins = []
     if i != 0:
@@ -71,11 +72,11 @@ def sample(i, j, X, Y, maxi, maxj):
     pond = 4/len(voisins) 
     
     # Calcul de la probabilité de valoir 1
-    exp_valeur_1 = -ALPHA + BETA * pond * (nb_0-nb_1) + 1/2*TAU*(MU[1]**2 - MU[0]**2 + 2*Y[i][j]*(MU[0]-MU[1]))
+    exp_valeur_1 = -ALPHA + BETA * pond * (nb_0-nb_1) + 1/2*(TAU**2)*(MU[1]**2 - MU[0]**2 + 2*Y[i][j]*(MU[0]-MU[1]))
     # Calcul de la probabilité de valoir 0 (juste pour vérifier)
-    exp_valeur_0 = ALPHA + BETA * pond * (nb_1-nb_0) + 1/2*TAU*(MU[0]**2 - MU[1]**2 + 2*Y[i][j]*(MU[1]-MU[0]))
+    exp_valeur_0 = ALPHA + BETA * pond * (nb_1-nb_0) + 1/2*(TAU**2)*(MU[0]**2 - MU[1]**2 + 2*Y[i][j]*(MU[1]-MU[0]))
     
-    #print(1/(1+np.exp(exp_valeur_1)))
+    #print(1/(1+np.exp(exp_valeur_1)) + 1/(1+np.exp(exp_valeur_0)))
     #print(1/(1+np.exp(exp_valeur_0)))
     
     prob = 1/(1+np.exp(exp_valeur_1))
