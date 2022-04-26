@@ -43,12 +43,11 @@ def noise(img, MU, TAU):
     
     return img_noised
 
-def sample(i, j, X, Y, maxi, maxj, ALPHA, BETA):
+def sample(i, j, X, Y, maxi, maxj, ALPHA, BETA, TAU, MU):
     """
     Echantillonne dans la distribution conditionnelle selon la formule que j'ai calculée
     """
-    MU = [0,1]
-    TAU = 0.1
+   
     # Ajout des valeurs des 4 voisins du pixel considéré, si pertinent
     voisins = []
     if i != 0:
@@ -80,9 +79,10 @@ def sample(i, j, X, Y, maxi, maxj, ALPHA, BETA):
     return(int(np.random.rand() < prob)) # Renvoie 1 si l'uniforme est inférieure à la proba de valoir 1
     
     
-def get_posterior(filename, burn_in, samples, ALPHA, BETA):
+def get_posterior(filename, burn_in, samples, ALPHA, BETA, TAU, MU = [0,1]):
     """
     Output les fréquences de valoir 1 pour chaque pixel
+    Par défaut mu vaut [0,1] donc pas de biais
     """
     Y = load_image(filename) # Chargement de l'image
     posterior = np.zeros(Y.shape)
@@ -95,7 +95,7 @@ def get_posterior(filename, burn_in, samples, ALPHA, BETA):
         # Ici on boucle de manière déterministe, idéalement il faudrait le faire de manière aléatoire
         for i in range(X.shape[0]):
             for j in range(X.shape[1]):
-                x = sample(i, j, X, Y, maxi, maxj, ALPHA, BETA)
+                x = sample(i, j, X, Y, maxi, maxj, ALPHA, BETA, TAU, MU)
                 X[i,j] = x
                 
                 if x == 1 and step >= burn_in:
@@ -107,13 +107,14 @@ def get_posterior(filename, burn_in, samples, ALPHA, BETA):
 
     return posterior
 
-def denoise_image(filename, burn_in, samples, ALPHA, BETA):
+def denoise_image(filename, burn_in, samples, ALPHA, BETA, TAU, MU = [0,1]):
     """
     Ici on considère comme 1 valant 1 les pixels où le posterior 
     vaut 1 à une fréquence supérieure à seuil
+    mu = [0,1] par défaut donc pas de biais
     """
     
-    posterior = get_posterior(filename, burn_in, samples, ALPHA, BETA)
+    posterior = get_posterior(filename, burn_in, samples, ALPHA, BETA, TAU, MU)
     denoised = np.zeros(posterior.shape, dtype=np.float64)
     denoised[posterior > 0.5] = 1 # POur passer des probas à des valeurs 
     
